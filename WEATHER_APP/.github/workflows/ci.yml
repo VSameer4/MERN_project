@@ -1,3 +1,11 @@
+name: Node + React Validation
+
+on:
+  push:
+    branches: [ 'master' ]      # any branch
+  pull_request:
+    branches: [ 'master' ]      # any PR
+
 jobs:
   validate-app:
     runs-on: ubuntu-latest
