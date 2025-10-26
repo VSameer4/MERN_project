@@ -1,0 +1,57 @@
+name: Node + React Build & Server Validation
+
+on:
+  push:
+    branches: [ master, dev ]
+  pull_request:
+    branches: [ master, dev ]
+
+jobs:
+  validate-app:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2️⃣ Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      # 3️⃣ Install backend dependencies
+      - name: Install backend dependencies
+        run: npm install
+
+      # 4️⃣ Check Node dependencies are installed
+      - name: Validate backend dependencies
+        run: |
+          if [ ! -d "node_modules" ]; then
+            echo "Backend dependencies not installed"
+            exit 1
+          fi
+
+      # 5️⃣ Install frontend dependencies
+      - name: Install frontend dependencies
+        run: |
+          npm install
+
+      # 6️⃣ Build frontend
+      - name: Build React frontend
+        run: |
+          npm run build
+
+      # 7️⃣ Run backend server to check startup
+      - name: Start backend server
+        run: |
+          # Run server in background
+          nohup npm start &
+          # Wait a few seconds to let server start
+          sleep 5
+          # Check if port 5000 is listening
+          if ! lsof -i:5000; then
+            echo "Backend server failed to start"
+            exit 1
+          fi
